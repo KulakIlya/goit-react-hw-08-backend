@@ -22,7 +22,12 @@ export const ContactSchema = SchemaFactory.createForClass(Contact);
 ContactSchema.methods.toJSON = function () {
   const contact = this.toObject();
 
+  const id = contact._id;
+
   delete contact.owner;
+  delete contact._id;
+
+  contact.id = id;
 
   return contact;
 };

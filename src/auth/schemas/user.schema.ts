@@ -25,8 +25,13 @@ export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.toJSON = function () {
   const user = this.toObject();
 
+  const id = user._id;
+
   delete user.password;
   delete user.token;
+  delete user._id;
+
+  user.id = id;
 
   return user;
 };
