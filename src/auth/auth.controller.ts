@@ -90,18 +90,12 @@ class AuthController {
   @Get('/current')
   async refreshUser(@Req() req: { user: JwtPayload }) {
     const user = await this.authService.findOne({ _id: req.user.sub });
-    console.log(user);
 
     if (!user)
       throw new HttpException(
         { message: 'Something went wrong. Please re-login' },
         HttpStatus.UNAUTHORIZED
       );
-
-    // const token = await generateJwtToken(this.jwtService, {
-    //   sub: req.user.sub,
-    //   email: req.user.email,
-    // });
 
     return {
       user,
