@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+// TODO: Add contact owner
 @Schema({
   versionKey: false,
   timestamps: true,

@@ -8,10 +8,12 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 
 import { ObjectId } from 'mongoose';
 import { IsObjectIdPipe } from 'nestjs-object-id';
+import AuthGuard from 'src/auth/auth.guard';
 import { CreateContactDto, UpdateContactDto } from './contacts.dto';
 import ContactsService from './contacts.service';
 
@@ -19,6 +21,7 @@ import ContactsService from './contacts.service';
 class ContactsController {
   constructor(private contactsService: ContactsService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   async getContacts() {
     return {
@@ -26,6 +29,7 @@ class ContactsController {
       data: await this.contactsService.getAll(),
     };
   }
+  @UseGuards(AuthGuard)
   @Post()
   async createContact(@Body() body: CreateContactDto) {
     return {
@@ -33,6 +37,7 @@ class ContactsController {
       data: await this.contactsService.create(body),
     };
   }
+  @UseGuards(AuthGuard)
   @Patch(':contactId')
   async updateContact(
     @Param('contactId', IsObjectIdPipe) contactId: ObjectId,
@@ -50,6 +55,7 @@ class ContactsController {
       data: await this.contactsService.updateById({ contactId, ...body }),
     };
   }
+  @UseGuards(AuthGuard)
   @Delete(':contactId')
   async deleteContact(@Param('contactId', IsObjectIdPipe) contactId: ObjectId) {
     const contact = await this.contactsService.findOne({ _id: contactId });
