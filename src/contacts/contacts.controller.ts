@@ -8,12 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 
 import { ObjectId } from 'mongoose';
 import { IsObjectIdPipe } from 'nestjs-object-id';
-import AuthGuard from 'src/auth/auth.guard';
+import AuthGuard from 'src/core/auth.guard';
+import { AuthRequest } from 'src/core/auth.types';
 import { CreateContactDto, UpdateContactDto } from './contacts.dto';
 import ContactsService from './contacts.service';
 
@@ -23,27 +25,31 @@ class ContactsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getContacts() {
+  async getContacts(@Req() req: AuthRequest) {
     return {
       message: 'Successfully found contacts!',
-      data: await this.contactsService.getAll(),
+      data: await this.contactsService.getAll(req.user.sub),
     };
   }
+
   @UseGuards(AuthGuard)
   @Post()
-  async createContact(@Body() body: CreateContactDto) {
+  async createContact(@Req() req: AuthRequest, @Body() body: CreateContactDto) {
+    const payload = { ...body, owner: req.user.sub };
     return {
       message: 'Contact has been created!',
-      data: await this.contactsService.create(body),
+      data: await this.contactsService.create(payload),
     };
   }
+
   @UseGuards(AuthGuard)
   @Patch(':contactId')
   async updateContact(
+    @Req() req: AuthRequest,
     @Param('contactId', IsObjectIdPipe) contactId: ObjectId,
     @Body() body: UpdateContactDto
   ) {
-    const contact = await this.contactsService.findOne({ _id: contactId });
+    const contact = await this.contactsService.findOne({ _id: contactId, owner: req.user.sub });
     if (!contact)
       throw new HttpException(
         { message: `Contact with id: ${contactId} not found` },
@@ -57,8 +63,11 @@ class ContactsController {
   }
   @UseGuards(AuthGuard)
   @Delete(':contactId')
-  async deleteContact(@Param('contactId', IsObjectIdPipe) contactId: ObjectId) {
-    const contact = await this.contactsService.findOne({ _id: contactId });
+  async deleteContact(
+    @Req() req: AuthRequest,
+    @Param('contactId', IsObjectIdPipe) contactId: ObjectId
+  ) {
+    const contact = await this.contactsService.findOne({ _id: contactId, owner: req.user.sub });
     if (!contact)
       throw new HttpException(
         { status: HttpStatus.NOT_FOUND, message: `Contact with id: ${contactId} not found` },

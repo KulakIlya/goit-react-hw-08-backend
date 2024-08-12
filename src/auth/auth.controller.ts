@@ -15,8 +15,8 @@ import * as bcrypt from 'bcrypt';
 import encrypt from 'src/helpers/encrypt';
 import generateJwtToken from 'src/helpers/generateJwtToken';
 
+import AuthGuard from '../core/auth.guard';
 import { LoginUserDto, SignUpUserDto } from './auth.dto';
-import AuthGuard from './auth.guard';
 import AuthService from './auth.service';
 import { JwtPayload } from './auth.types';
 

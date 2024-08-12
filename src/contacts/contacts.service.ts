@@ -10,8 +10,8 @@ class ContactsService {
   async findOne(filter: { [x: string]: string | ObjectId }) {
     return this.contactModel.findOne(filter);
   }
-  async getAll() {
-    return this.contactModel.find();
+  async getAll(owner: ObjectId) {
+    return this.contactModel.find({ owner });
   }
   async create(payload: CreateContactDto) {
     return this.contactModel.create(payload);
